@@ -37,6 +37,7 @@ module.exports = {
                   drop_console: true,
                 },
               },
+              extractComments: false
             }),
           ]
         : [],
