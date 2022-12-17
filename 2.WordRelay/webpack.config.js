@@ -1,8 +1,9 @@
 const path = require('path');
 
 const HtmlWebpackPlugin = require("html-webpack-plugin");
-// const ReactRefreshWebpackPlugin = require('@pmmmwh/react-refresh-webpack-plugin');
-// const webpack = require('webpack');
+const { CleanWebpackPlugin } = require("clean-webpack-plugin");
+const TerserPlugin = require("terser-webpack-plugin");
+const CopyWebpackPlugin = require("copy-webpack-plugin");
 
 const webpackMode = process.env.NODE_ENV || "development";
 
@@ -17,6 +18,35 @@ module.exports = {
   entry: {
     app: './src/client',
   },
+  output: {
+    path: path.resolve("./dist"),
+    filename: "[name].min.js",
+  },
+  devServer: {
+    static: { directory: path.resolve(__dirname) },
+    hot: true,
+    port: 8084,
+    allowedHosts: "all",
+    host: "0.0.0.0",
+  },
+  optimization: {
+    minimizer:
+      webpackMode === "production"
+        ? [
+            new TerserPlugin({
+              terserOptions: {
+                compress: {
+                  drop_console: true,
+                },
+              },
+              extractComments: false
+            }),
+          ]
+        : [],
+    splitChunks: {
+      chunks: "all",
+    },
+  },
   module: {
     rules: [{
       test: /\.jsx?$/,
@@ -29,7 +59,6 @@ module.exports = {
           }],
           '@babel/preset-react',
         ],
-        // plugins: ['react-refresh/babel'],
       },
       exclude: path.join(__dirname, 'node_modules'),
     }],
@@ -45,74 +74,11 @@ module.exports = {
             }
           : false,
     }),
-    // new webpack.HotModuleReplacementPlugin(),
-    // new ReactRefreshWebpackPlugin(),
+    new CleanWebpackPlugin(),
+    // new CopyWebpackPlugin({
+    //   patterns: [
+    //     { from: "./src/images", to: "./images" },
+    //   ],
+    // }),
   ],
-  output: {
-    // path: path.join(__dirname, 'dist'),
-    // filename: '[name].js',
-    path: path.resolve("./dist"),
-    filename: "[name].min.js",
-  },
-  devServer: {
-    // devMiddleware: { publicPath: '/dist' },
-    static: { directory: path.resolve(__dirname) },
-    hot: true,
-    port: 8084,
-    allowedHosts: "all",
-    host: "0.0.0.0",
-  }
 };
-
-// const path = require('path');
-// const ReactRefreshWebpackPlugin = require('@pmmmwh/react-refresh-webpack-plugin');
-// const webpack = require('webpack');
-
-// const webpackMode = process.env.NODE_ENV || "development";
-
-// module.exports = {
-//   name: 'word-relay-dev',
-//   // mode: 'development',
-//   mode: webpackMode,
-//   devtool: 'inline-source-map',
-//   resolve: {
-//     extensions: ['.js', '.jsx'],
-//   },
-//   entry: {
-//     app: './client',
-//   },
-//   module: {
-//     rules: [{
-//       test: /\.jsx?$/,
-//       loader: 'babel-loader',
-//       options: {
-//         presets: [
-//           ['@babel/preset-env', {
-//             targets: {browsers: ['last 2 chrome versions']},
-//             debug: true,
-//           }],
-//           '@babel/preset-react',
-//         ],
-//         plugins: ['react-refresh/babel'],
-//       },
-//       exclude: path.join(__dirname, 'node_modules'),
-//     }],
-//   },
-//   plugins: [
-//     new webpack.HotModuleReplacementPlugin(),
-//     new ReactRefreshWebpackPlugin(),
-//   ],
-//   output: {
-//     path: path.join(__dirname, 'dist'),
-//     filename: '[name].js',
-//     publicPath: '/dist',
-//   },
-//   devServer: {
-//     devMiddleware: { publicPath: '/dist' },
-//     static: { directory: path.resolve(__dirname) },
-//     hot: true,
-//     port: 8084,
-//     allowedHosts: "all",
-//     host: "0.0.0.0"
-//   }
-// };

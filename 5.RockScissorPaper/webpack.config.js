@@ -1,6 +1,10 @@
 const path = require('path');
 
 const HtmlWebpackPlugin = require("html-webpack-plugin");
+const { CleanWebpackPlugin } = require("clean-webpack-plugin");
+const TerserPlugin = require("terser-webpack-plugin");
+const CopyWebpackPlugin = require("copy-webpack-plugin");
+
 const webpackMode = process.env.NODE_ENV || "development";
 
 module.exports = {
@@ -11,6 +15,35 @@ module.exports = {
   },
   entry: {
     app: './src/client',
+  },
+  output: {
+    path: path.resolve("./dist"),
+    filename: "[name].min.js",
+  },
+  devServer: {
+    static: { directory: path.resolve(__dirname) },
+    hot: true,
+    port: 8084,
+    allowedHosts: "all",
+    host: "0.0.0.0",
+  },
+  optimization: {
+    minimizer:
+      webpackMode === "production"
+        ? [
+            new TerserPlugin({
+              terserOptions: {
+                compress: {
+                  drop_console: true,
+                },
+              },
+              extractComments: false
+            }),
+          ]
+        : [],
+    splitChunks: {
+      chunks: "all",
+    },
   },
   module: {
     rules: [{
@@ -39,16 +72,11 @@ module.exports = {
             }
           : false,
     }),
+    new CleanWebpackPlugin(),
+    // new CopyWebpackPlugin({
+    //   patterns: [
+    //     { from: "./src/images", to: "./images" },
+    //   ],
+    // }),
   ],
-  output: {
-    path: path.resolve("./dist"),
-    filename: "[name].min.js",
-  },
-  devServer: {
-    static: { directory: path.resolve(__dirname) },
-    hot: true,
-    port: 8084,
-    allowedHosts: "all",
-    host: "0.0.0.0",
-  }
 };
