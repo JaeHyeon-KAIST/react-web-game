@@ -7,6 +7,27 @@ const CopyWebpackPlugin = require("copy-webpack-plugin");
 
 const webpackMode = process.env.NODE_ENV || "development";
 
+const plugins = [
+  new HtmlWebpackPlugin({
+      template: "./src/index.html",
+      minify:
+        process.env.NODE_ENV === "production"
+          ? {
+              collapseWhitespace: true,
+              removeComments: true,
+            }
+          : false,
+    }),
+  // new CopyWebpackPlugin({
+  //     patterns: [
+  //       { from: "./src/images", to: "./images" },
+  //     ],
+  //   }),
+];
+if (process.env.NODE_ENV === "production") {
+  plugins.push(new CleanWebpackPlugin());
+}
+
 module.exports = {
   name: 'response-check',
   mode: webpackMode,
@@ -61,22 +82,5 @@ module.exports = {
       exclude: path.join(__dirname, 'node_modules'),
     }],
   },
-  plugins: [
-    new HtmlWebpackPlugin({
-      template: "./src/index.html",
-      minify:
-        process.env.NODE_ENV === "production"
-          ? {
-              collapseWhitespace: true,
-              removeComments: true,
-            }
-          : false,
-    }),
-    new CleanWebpackPlugin(),
-    // new CopyWebpackPlugin({
-    //   patterns: [
-    //     { from: "./src/images", to: "./images" },
-    //   ],
-    // }),
-  ],
+  plugins,
 };

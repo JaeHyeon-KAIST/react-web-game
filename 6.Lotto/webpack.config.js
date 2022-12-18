@@ -29,7 +29,7 @@ if (process.env.NODE_ENV === "production") {
 }
 
 module.exports = {
-  name: 'tic-tac-toe',
+  name: 'lotto',
   mode: webpackMode,
   resolve: {
     extensions: ['.js', '.jsx'],
